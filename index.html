@@ -93,7 +93,7 @@ label{font-size:13px;font-weight:600;color:var(--mut);display:block;margin-botto
 .cam{position:fixed;inset:0;background:#000;z-index:70;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:16px}.cam.on{display:flex}
 .cam video{max-width:100%;max-height:68vh;border-radius:16px;background:#111}.cam .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 .nav button.on{color:var(--ac);font-weight:700}
-@media(min-width:900px){.stats{grid-template-columns:repeat(6,1fr)}}
+@media(min-width:900px){.stats{grid-template-columns:repeat(5,1fr)}}
 .pgs{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:14px}.pgs .wide{grid-column:1/-1}
 .ch{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:16px;box-shadow:var(--sh);min-width:0}.ch h3{margin:0 0 12px;font-size:15px}
 .hb{display:grid;grid-template-columns:minmax(80px,36%) 1fr 36px;gap:8px;align-items:center;margin:7px 0;font-size:12.5px}.hl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -111,6 +111,10 @@ label{font-size:13px;font-weight:600;color:var(--mut);display:block;margin-botto
 .an .an-sg td{border:0;background:none;text-align:center;font-weight:400;width:auto}.an .an-sg tr:first-child td{font-weight:700}
 .an-ft{margin-top:auto;text-align:center;font-size:8.5px;color:#8a949e;padding-top:20px}
 @media print{@page{size:A4;margin:12mm}body{background:#fff!important}body>*:not(#pr){display:none!important}body::before{display:none!important}#pr{display:block!important}.an{break-after:page;page-break-after:always}.an:last-child{break-after:auto;page-break-after:auto}}
+.gp{min-width:0}.gb{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0 10px}.gb .btn{padding:9px 12px;font-size:13px}
+.gt{display:flex;flex-wrap:wrap;gap:8px}.gi{position:relative;width:78px;height:78px;border-radius:10px;overflow:hidden;border:1px solid var(--bd)}
+.gi img{width:100%;height:100%;object-fit:cover;cursor:zoom-in}.gi .rm{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;font-size:11px}
+.big{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:80;display:none;align-items:center;justify-content:center;padding:14px}.big.on{display:flex}.big img{max-width:100%;max-height:100%;border-radius:12px}
 </style>
 </head>
 <body>
@@ -121,7 +125,7 @@ label{font-size:13px;font-weight:600;color:var(--mut);display:block;margin-botto
   <button class="burger" id="bg" aria-label="Меню"><i></i><i></i><i></i></button>
 </header>
 <main>
-  <div class="stats"><div class="stat"><b id="s1">0</b><span>Сотрудников</span></div><div class="stat"><b id="s2">0</b><span>Кабинетов</span></div><div class="stat"><b id="s3">0</b><span>Отделов</span></div><div class="stat"><b id="s4">0</b><span>С фото</span></div><div class="stat"><b id="s5">0</b><span>Техданные есть</span></div><div class="stat"><b id="s6">0</b><span>Без техданных</span></div></div>
+  <div class="stats"><div class="stat"><b id="s1">0</b><span>Сотрудников</span></div><div class="stat"><b id="s2">0</b><span>Кабинетов</span></div><div class="stat"><b id="s4">0</b><span>С фото</span></div><div class="stat"><b id="s5">0</b><span>Техданные есть</span></div><div class="stat"><b id="s6">0</b><span>Без техданных</span></div></div>
   <div class="bar"><input class="search" id="q" placeholder="Поиск: кабинет, ФИО, отдел, принтер..."><button class="btn" id="vw">▦ Таблица</button></div>
   <div class="grid" id="list"></div>
   <div class="pgs" id="pgs" style="display:none"></div>
@@ -159,7 +163,8 @@ label{font-size:13px;font-weight:600;color:var(--mut);display:block;margin-botto
 <input class="in" id="le" type="text" placeholder="Логин" autocomplete="username" autocapitalize="off" required><input class="in" id="lp" type="password" placeholder="Пароль" autocomplete="current-password" required>
 <div class="err" id="lr"></div><button class="btn p" type="submit">Войти</button></form></div>
 <div class="cam" id="cam"><video id="cv" autoplay playsinline muted></video><div class="row"><button class="btn" id="cflip">🔄 Камера</button><button class="btn p" id="csnap">📸 Снять</button><button class="btn" id="cx">Отмена</button></div></div>
-<input type="file" id="ff" accept="image/*" hidden><input type="file" id="fc2" accept="image/*" capture="user" hidden>
+<div class="big" id="big"><img id="bi" alt=""></div>
+<input type="file" id="fg" accept="image/*" multiple hidden><input type="file" id="ff" accept="image/*" hidden><input type="file" id="fc2" accept="image/*" capture="user" hidden>
 <div class="toast" id="tt"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -193,7 +198,7 @@ const sv=(k,v)=>{mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v))}catch(e)
 const CF=window.ESA_CONFIG||{};
 const sb=supabase.createClient(CF.url||"http://x",CF.key||"x");
 async function load(){
-  const {data,error}=await sb.from("inventory").select("*").order("created_at",{ascending:true});
+  const {data,error}=await sb.from("inventory").select("id,grp,kab,otdel,fio,cpu,ram,hdd,kb,mon,prn,usr,spk,cam,hub,wifi,sig,pw,photo,photo_count,created_at").order("created_at",{ascending:true});
   if(error){toast("Ошибка: "+error.message);return}
   rows=data;render();if(page==="s")stats();syncPhotos();
 }
@@ -216,16 +221,33 @@ function render(){
   const r=rows.filter(x=>!q||F.some(f=>!f.pw&&String(x[f.k]||"").toLowerCase().includes(q)));
   $("#s1").textContent=rows.length;
   $("#s2").textContent=new Set(rows.map(x=>x.kab).filter(Boolean)).size;
-  $("#s3").textContent=new Set(rows.map(x=>(x.grp||"").trim().toLowerCase()).filter(Boolean)).size;
-  $("#s4").textContent=rows.filter(x=>x.photo).length;$("#s5").textContent=rows.filter(x=>tstate(x)==="full").length;$("#s6").textContent=rows.filter(x=>tstate(x)==="none").length;
+    $("#s4").textContent=rows.filter(x=>x.photo).length;$("#s5").textContent=rows.filter(x=>tstate(x)==="full").length;$("#s6").textContent=rows.filter(x=>tstate(x)==="none").length;
   $("#list").innerHTML=r.length&&view==="t"?tbl(r):r.length?cards(r)
    :`<div class="empty" style="grid-column:1/-1"><big>🗂️</big>${rows.length?"Ничего не найдено":"Пока нет записей.<br>Нажмите «+» чтобы зарегистрировать."}</div>`;
 }
-let curPhoto="",stream=null,face="user";
+let curPhoto="",stream=null,face="user",camMode="face",gen=[],genOk=true,genDirty=false;
+const GP='<div class="gp" id="gp"><label>Общие фото</label><div class="gb"><button type="button" class="btn" id="gcam">📷 Снять</button><button type="button" class="btn" id="gup">🖼 Загрузить</button><span class="nm2" id="gc"></span></div><div class="gt" id="gt"></div></div>';
+function fitMax(src,max,q){const sw=src.videoWidth||src.naturalWidth||src.width,sh=src.videoHeight||src.naturalHeight||src.height,k=Math.min(1,max/Math.max(sw,sh)),w=Math.round(sw*k),h=Math.round(sh*k),c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(src,0,0,w,h);return c.toDataURL("image/jpeg",q||.7)}
+function genUI(){
+  const t=$("#gt");if(!t)return;
+  t.innerHTML=!genOk?'<span class="nm2">Загрузка…</span>':gen.length?gen.map((u,i)=>`<div class="gi"><img src="${u}" data-z="${i}" alt=""><button type="button" class="rm" data-gd="${i}">✕</button></div>`).join(""):'<span class="nm2">Фото пока нет</span>';
+  $("#gc").textContent=gen.length?"Снимков: "+gen.length:"";
+}
+function addGen(u){gen.push(u);genDirty=true;genUI()}
+function pickMany(fs){[...fs].forEach(f=>{const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{addGen(fitMax(im,1000,.7));URL.revokeObjectURL(u)};im.onerror=()=>toast("Не удалось открыть фото");im.src=u})}
+async function loadGen(id){
+  gen=[];genDirty=false;genOk=!id;genUI();if(!id)return;
+  const {data,error}=await sb.from("inventory").select("photos").eq("id",id).maybeSingle();
+  if(id!==cur)return;
+  if(error){toast("Не удалось загрузить фото: "+error.message);return}
+  gen=(data&&data.photos)||[];genOk=true;genUI();
+}
+function bigShow(u){$("#bi").src=u;$("#big").classList.add("on")}
 function ini(n){return (n||"?").split(" ").slice(0,2).map(s=>s[0]).join("").toUpperCase()}
 function card(x){
   const tg=["cpu","ram","hdd","mon","prn","usr"].filter(k=>x[k]).map(k=>`<span class="tag">${esc(x[k])}</span>`).join("");
-  return `<div class="item"><div class="top"><div class="pic">${x.photo?`<img src="${x.photo}" alt="">`:ini(x.fio)}<span class="kb">каб. ${esc(x.kab||"—")}</span></div><div class="nm"><b>${esc(x.fio||"Без ФИО")}</b><span>${esc(x.otdel||"")}</span></div></div>${tg?`<div class="tags">${tg}</div>`:""}<div class="acts"><button class="btn" data-e="${x.id}">✏️ Изменить</button><button class="btn d" data-d="${x.id}">🗑 Удалить</button></div><div class="acts" style="margin-top:8px"><button class="btn" data-w="${x.id}">📄 Word</button><button class="btn" data-p="${x.id}">🖨 Печать</button></div></div>`}
+  const tg2=(x.photo_count?`<span class="tag">📷 ${x.photo_count}</span>`:"")+tg;
+  return `<div class="item"><div class="top"><div class="pic">${x.photo?`<img src="${x.photo}" alt="">`:ini(x.fio)}<span class="kb">каб. ${esc(x.kab||"—")}</span></div><div class="nm"><b>${esc(x.fio||"Без ФИО")}</b><span>${esc(x.otdel||"")}</span></div></div>${tg2?`<div class="tags">${tg2}</div>`:""}<div class="acts"><button class="btn" data-e="${x.id}">✏️ Изменить</button><button class="btn d" data-d="${x.id}">🗑 Удалить</button></div><div class="acts" style="margin-top:8px"><button class="btn" data-w="${x.id}">📄 Word</button><button class="btn" data-p="${x.id}">🖨 Печать</button></div></div>`}
 function cards(r){
   const g={};r.forEach(x=>{const o=x.grp||"Без раздела";(g[o]=g[o]||[]).push(x)});
   return Object.keys(g).sort((a,b)=>(PRE.indexOf(a)+1||99)-(PRE.indexOf(b)+1||99)).map(o=>`<div class="band">${esc(o)}</div>`+g[o].map(card).join("")).join("");
@@ -238,9 +260,10 @@ function fit(src,w,h){
   return c.toDataURL("image/jpeg",.72);
 }
 function pick(f){if(!f)return;const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{curPhoto=fit(im,240,300);URL.revokeObjectURL(u);av()};im.onerror=()=>toast("Не удалось открыть фото");im.src=u}
-async function camOpen(){
+async function camOpen(mode){
+  camMode=mode||"face";$("#cx").textContent=camMode==="gen"?"✓ Готово":"Отмена";
   try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:face,width:{ideal:1280}},audio:false});$("#cv").srcObject=stream;$("#cam").classList.add("on")}
-  catch(e){$("#fc2").click()}
+  catch(e){camMode==="gen"?$("#fg").click():$("#fc2").click()}
 }
 function camClose(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}$("#cam").classList.remove("on")}
 let phTried=0;
@@ -346,6 +369,7 @@ function stats(){
   $("#pgs").innerHTML=
     dn("Данные об оборудовании",[["Заполнено",S.full,CK.ok],["Частично",S.part,CK.mid],["Не заполнено",S.none,CK.bad]])+
     dn("Фото сотрудников",[["Есть",ph,CK.ok],["Нет",T-ph,CK.bad]])+
+    dn("Общие фото (по записям)",[["Есть",rows.filter(x=>x.photo_count>0).length,CK.ok],["Нет",rows.filter(x=>!x.photo_count).length,CK.mut]])+
     dn("Подпись в анкете",[["Подписано",rows.filter(x=>fl(x.sig)).length,CK.ok],["Не подписано",rows.filter(x=>!fl(x.sig)).length,CK.mid]])+
     hb("Сотрудники по разделам",gr,"wide")+
     stk("Наличие оборудования",["prn","spk","cam","hub","wifi","usr"])+
@@ -384,8 +408,8 @@ function build(x){
     else if(f.pw)inp=`<div class="pw"><input class="in" name="${f.k}" type="password" value="${v}" autocomplete="new-password" autocapitalize="off"><button type="button" data-eye>👁</button></div>`;
     else inp=`<input class="in" name="${f.k}" value="${v}" inputmode="${f.im||"text"}" placeholder="${f.ph||""}" autocapitalize="${f.k==="usr"||f.k==="grp"?"off":"sentences"}" autocorrect="off" spellcheck="false">`;
     const h=`<div class="f" data-k="${f.k}"><label>${f.l}</label>${inp}${f.yn||f.pw||f.nos&&0?"":'<div class="chips"></div>'}</div>`;
-    return f.k==="fio"?`<div class="fr">${h}<div class="phb"><div class="av" id="av"></div><button type="button" class="btn" id="pcam">📷 Снять</button><button type="button" class="btn" id="pup">🖼 Загрузить</button></div></div>`:h}).join("");
-  curPhoto=x.photo||"";av();
+    return f.k==="fio"?`<div class="fr">${h}<div class="phb"><div class="av" id="av"></div><button type="button" class="btn" id="pcam">📷 Снять</button><button type="button" class="btn" id="pup">🖼 Загрузить</button></div></div>`:f.k==="pw"?h+GP:h}).join("");
+  curPhoto=x.photo||"";av();loadGen(x.id);
   F.forEach(f=>{if(!f.yn&&!f.pw)chips(f.k)});
 }
 function chips(k){
@@ -407,6 +431,7 @@ async function save(){
     if(f.yn){const b=$(`[data-yn="${f.k}"] .on`);o[f.k]=b?b.dataset.v:""}
     else o[f.k]=$(`[name="${f.k}"]`).value.trim()});
   o.photo=curPhoto;
+  if(genOk&&genDirty)o.photos=gen;
   const pm=PRE.find(p=>p.toLowerCase()===o.grp.toLowerCase());if(pm)o.grp=pm;
   else{const ex=rows.find(r=>r.grp&&r.grp.toLowerCase()===o.grp.toLowerCase());if(ex)o.grp=ex.grp}
   if(!o.kab&&!o.fio){toast("Укажите № кабинета или ФИО");return}
@@ -490,12 +515,19 @@ $("#inst").onclick=async()=>{
 };
 $("#hn").onclick=()=>open();$("#hx").onclick=xl;
 $("#fm").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
-  if(b.id==="pcam")camOpen();else if(b.id==="pup")$("#ff").click();else if(b.id==="prm"){curPhoto="";av()}});
+  if(b.id==="pcam")camOpen("face");else if(b.id==="gcam")camOpen("gen");else if(b.id==="gup")$("#fg").click();else if(b.id==="pup")$("#ff").click();else if(b.id==="prm"){curPhoto="";av()}});
 $("#ff").onchange=e=>{pick(e.target.files[0]);e.target.value=""};
 $("#fc2").onchange=e=>{pick(e.target.files[0]);e.target.value=""};
 $("#cx").onclick=camClose;
-$("#cflip").onclick=()=>{face=face==="user"?"environment":"user";camClose();camOpen()};
-$("#csnap").onclick=()=>{const v=$("#cv");if(!v.videoWidth)return;curPhoto=fit(v,240,300);camClose();av()};
+$("#cflip").onclick=()=>{face=face==="user"?"environment":"user";const m=camMode;camClose();camOpen(m)};
+$("#fg").onchange=e=>{pickMany(e.target.files);e.target.value=""};
+$("#big").onclick=()=>$("#big").classList.remove("on");
+$("#fm").addEventListener("click",e=>{
+  const im=e.target.closest("img[data-z]");if(im){bigShow(gen[+im.dataset.z]);return}
+  const b=e.target.closest("button[data-gd]");if(b){gen.splice(+b.dataset.gd,1);genDirty=true;genUI()}});
+$("#csnap").onclick=()=>{const v=$("#cv");if(!v.videoWidth)return;
+  if(camMode==="gen"){addGen(fitMax(v,1000,.7));toast("Снимков: "+gen.length)}
+  else{curPhoto=fit(v,240,300);camClose();av()}};
 $("#lo").onclick=async()=>{hide();await sb.auth.signOut()};
 $("#lf").onsubmit=async e=>{e.preventDefault();$("#lr").textContent="";
   const {error}=await sb.auth.signInWithPassword({email:(x=>x.includes("@")?x:x+"@esa.kg")($("#le").value.trim().toLowerCase()),password:$("#lp").value});
